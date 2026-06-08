@@ -35,7 +35,7 @@ Phase 1 — Core (must ship)
 - [x] src/index.js — Express server with health check
 - [x] src/config/db.js — Knex connection pool
 - [x] Initial migration — all 6 tables created (sports, users, fields,
-      games, game_players, messages)
+      games, game_players, messages) with indexes, status column on games, is_recurring boolean, and role/status CHECK constraints 
 - [x] runit_dev and runit_test databases created
 - [x] Health check verified: GET /health → { status: ok, db: connected }
 
@@ -126,11 +126,12 @@ knex_migrations, knex_migrations_lock
 
 ## Decisions log (quick reference)
 
-| Decision | Rationale | ADR |
-|----------|-----------|-----|
-| UUID for users/games/messages | Prevents enumeration attacks | pending |
-| Integer PK for sports/fields | Never in URLs, faster joins | pending |
-| bcrypt rounds=12 | ~400ms — secure without perceptible lag | pending |
-| JWT 15m access + 7d refresh cookie | Short blast radius + seamless UX | pending |
-| Knex over Prisma/TypeORM | SQL-like, no black-box magic | pending |
-| Vanilla JS + Alpine over React | Shows platform understanding | pending |
+| Decision                           | Rationale                                                  | ADR     |
+| ---------------------------------- | ---------------------------------------------------------- | ------- |
+| UUID for users/games/messages      | Prevents enumeration attacks                               | pending |
+| Integer PK for sports/fields       | Never in URLs, faster joins                                | pending |
+| bcrypt rounds=12                   | ~400ms — secure without perceptible lag                    | pending |
+| JWT 15m access + 7d refresh cookie | Short blast radius + seamless UX                           | pending |
+| Knex over Prisma/TypeORM           | SQL-like, no black-box magic                               | pending |
+| Vanilla JS + Alpine over React     | Shows platform understanding                               | pending |
+| is_recurring on games              | Pickup games repeat weekly — schema should reflect reality | pending |
