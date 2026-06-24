@@ -23,6 +23,7 @@ app.use(
 
 // ─── Health check ──────────────────────────────────────────────────────────────
 const db = require('./config/db');
+const authRoutes = require('./routes/auth');
 
 app.get('/health', async (req, res) => {
     try {
@@ -36,6 +37,9 @@ app.get('/health', async (req, res) => {
         res.status(503).json({ status: 'error', db: 'disconnected' });
     }
 });
+
+// ─── Routes ───────────────────────────────────────────────────────────────────
+app.use('/auth', authRoutes);
 
 // ─── Base route ────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
