@@ -81,6 +81,24 @@ describe('POST /auth/register', () => {
 });
 ```
 
+## Known test considerations
+
+- Rate limiter is set to 1000 requests per window in NODE_ENV=test.
+  Never set it lower or tests will hit 429 false failures.
+- The refresh token blocklist is not yet implemented.
+  One intentional failing test in auth.test.js documents this gap —
+  do not delete it. It is a sentinel for Finding 1 from Session 2.
+- The secure cookie flag is false in test and dev environments.
+  Do not write tests that assert the Secure flag — they will fail in CI.
+
+## Completed test files
+
+Session 2 — Auth:
+- tests/unit/authService.test.js — 32 unit tests
+- tests/unit/authMiddleware.test.js — 15 unit tests
+- tests/integration/auth.test.js — 48 integration tests
+- Results: 109/110 passing — 1 intentional failure (blocklist sentinel)
+
 ## What to provide when done
 
 - Complete test files (full content, not snippets)

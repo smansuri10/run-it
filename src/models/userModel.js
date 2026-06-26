@@ -45,6 +45,18 @@ const findById = async (id) => {
 };
 
 /**
+ * Find a user by username.
+ * Used during registration to check if username is already taken.
+ */
+const findByUsername = async (username) => {
+    return db('users')
+        .where({ username })
+        .whereNull('deleted_at')
+        .select(['id', 'username'])
+        .first();
+};
+
+/**
  * Create a new user and return the created record.
  */
 const create = async (userData) => {
@@ -54,4 +66,4 @@ const create = async (userData) => {
     return user;
 };
 
-module.exports = { findByEmail, findById, create };
+module.exports = { findByEmail, findById, findByUsername, create };

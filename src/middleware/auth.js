@@ -34,7 +34,9 @@ const authenticate = async (req, res, next) => {
             return res.status(401).json({ error: 'User not found' });
         }
 
-        req.user = user;
+        // Defensively strip sensitive fields regardless of what the model returns
+        const { password_hash, deleted_at, ...safeUser } = user;
+        req.user = safeUser;
         next();
     } catch (err) {
         next(err);

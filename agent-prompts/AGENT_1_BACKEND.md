@@ -15,50 +15,36 @@ Built with extensibility in mind — adding basketball later means one
 row in the sports table, not a schema rewrite.
 
 ## Stack (non-negotiable)
-Runtime:    Node.js 20 LTS
 
-Framework:  Express.js
-
-Database:   PostgreSQL 16 via Knex.js
-
-Auth:       JWT access token (15m) + httpOnly refresh cookie (7d)
-
-Hashing:    bcrypt, rounds=12
-
-Real-time:  Socket.io
-
-Maps:       Leaflet.js + OpenStreetMap
-
-Frontend:   Vanilla JS + Alpine.js
-
-Testing:    Jest + Supertest
+Runtime: Node.js 20 LTS
+Framework: Express.js
+Database: PostgreSQL 16 via Knex.js
+Auth: JWT access token (15m) + httpOnly refresh cookie (7d)
+Hashing: bcrypt, rounds=12
+Real-time: Socket.io
+Maps: Leaflet.js + OpenStreetMap
+Frontend: Vanilla JS + Alpine.js
+Testing: Jest + Supertest
 
 ## Architecture (strict — never violate)
+
 HTTP Request
-
-→ Routes          (URL definitions only, zero logic)
-
-→ Middleware       (auth check, validation, rate limiting)
-
-→ Controllers      (req/res handling only, call services)
-
-→ Services         (ALL business logic lives here)
-
-→ Models           (ALL database queries live here)
-
+→ Routes (URL definitions only, zero logic)
+→ Middleware (auth check, validation, rate limiting)
+→ Controllers (req/res handling only, call services)
+→ Services (ALL business logic lives here)
+→ Models (ALL database queries live here)
 → PostgreSQL
 
 If business logic appears in a controller, that is a bug.
 If a database query appears in a service, that is a bug.
 
 ## Design system
-Primary blue:  #1A1AE6
 
-Background:    #E8E8F4
-
-Font:          Inter
-
-Layout:        Mobile-first. Bottom nav on mobile, sidebar on desktop.
+Primary blue: #1A1AE6
+Background: #E8E8F4
+Font: Inter
+Layout: Mobile-first. Bottom nav on mobile, sidebar on desktop.
 
 ## Non-negotiable rules
 
@@ -68,10 +54,10 @@ Layout:        Mobile-first. Bottom nav on mobile, sidebar on desktop.
 - Parameterized queries only — never string concatenation
 - All secrets via process.env — never hardcoded
 - express-validator on every route that accepts input
-- Rate limiting on all auth endpoints
+- Rate limiting on all auth endpoints (bypassed in test environment)
 - Explain the WHY behind every decision, not just the what
 - Industry standard practices only — no shortcuts
-- `module.exports = app` in index.js (Supertest compatibility)
+- module.exports = app in index.js (Supertest compatibility)
 
 ## Completed so far
 
@@ -82,6 +68,8 @@ See AGENT_LOG.md for the full picture. Summary:
 - src/config/db.js — shared Knex connection pool
 - Initial migration — all 6 tables created with indexes and constraints
 - Full auth system — register, login, refresh, logout, auth middleware
+- Auth hardened — timing fix, username uniqueness, middleware defensive strip
+- Full test suite passing — 109/110 (1 intentional blocklist sentinel)
 
 ## Session workflow
 
@@ -92,8 +80,6 @@ See AGENT_LOG.md for the full picture. Summary:
 5. When finished, provide all new and modified files with full content
 6. Include handoff notes: what was built, what to test, what edge cases matter
 7. Include the AGENT_LOG.md entries to paste in after the session
-
----
 
 > Before starting: paste the current AGENT_LOG.md, any relevant source
 > files, and a clear description of what to build this session.

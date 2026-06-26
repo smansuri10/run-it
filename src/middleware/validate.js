@@ -55,7 +55,7 @@ const validateLogin = [
         .normalizeEmail(),
 
     body('password')
-        .notEmpty()
+        .isLength({ min: 1 })
         .withMessage('Password is required'),
 
     handleValidationErrors,

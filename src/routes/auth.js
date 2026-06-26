@@ -10,8 +10,8 @@ const rateLimit = require('express-rate-limit');
  * Prevents brute force attacks on login and register.
  */
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10,
+    windowMs: 15 * 60 * 1000,
+    max: process.env.NODE_ENV === 'test' ? 1000 : 10,
     message: { error: 'Too many attempts, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
