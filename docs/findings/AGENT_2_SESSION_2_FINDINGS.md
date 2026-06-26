@@ -6,11 +6,11 @@
 
 ## Files delivered
 
-| File | Purpose |
-|---|---|
-| `tests/unit/authService.test.js` | Unit tests — register, login, refresh (model layer mocked) |
-| `tests/unit/authMiddleware.test.js` | Unit tests — authenticate middleware (model + JWT mocked) |
-| `tests/integration/auth.test.js` | Integration tests — all 4 auth endpoints against runit_test |
+| File                                | Purpose                                                     |
+| ----------------------------------- | ----------------------------------------------------------- |
+| `tests/unit/authService.test.js`    | Unit tests — register, login, refresh (model layer mocked)  |
+| `tests/unit/authMiddleware.test.js` | Unit tests — authenticate middleware (model + JWT mocked)   |
+| `tests/integration/auth.test.js`    | Integration tests — all 4 auth endpoints against runit_test |
 
 ---
 
