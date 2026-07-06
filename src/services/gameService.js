@@ -6,7 +6,7 @@ const gameModel = require('../models/gameModel');
  */
 const createGame = async (hostId, gameData) => {
     // Validate location — must have either field_id or lat/lng
-    if (!gameData.field_id && !(gameData.location_lat && gameData.location_lng)) {
+    if (!gameData.field_id && !(gameData.location_lat !== undefined && gameData.location_lat !== null && gameData.location_lng !== undefined && gameData.location_lng !== null)) {
         const error = new Error('A game must have either a field or a location');
         error.status = 400;
         throw error;

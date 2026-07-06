@@ -52,24 +52,26 @@ const findAll = async ({ lat, lng, radius, sport_id, skill_level } = {}) => {
     }
 
     // Location filter using Haversine formula
-    if (lat && lng && radius) {
+    if (lat !== undefined && lat !== null && lng !== undefined && lng !== null && radius) {
         query = query.whereRaw(`
-      (
-        6371 * acos(
-          cos(radians(?)) *
-          cos(radians(
-            COALESCE(fields.latitude, games.location_lat)
-          )) *
-          cos(radians(
-            COALESCE(fields.longitude, games.location_lng)
-          ) - radians(?)) +
-          sin(radians(?)) *
-          sin(radians(
-            COALESCE(fields.latitude, games.location_lat)
-          ))
-        )
-      ) <= ?
-    `, [lat, lng, lat, radius]);
+            (
+              6371 * acos(
+                GREATEST(-1, LEAST(1,
+                  cos(radians(?)) *
+                  cos(radians(
+                    COALESCE(fields.latitude, games.location_lat)
+                  )) *
+                  cos(radians(
+                    COALESCE(fields.longitude, games.location_lng)
+                  ) - radians(?)) +
+                  sin(radians(?)) *
+                  sin(radians(
+                    COALESCE(fields.latitude, games.location_lat)
+                  ))
+                ))
+              )
+            ) <= ?
+          `, [lat, lng, lat, radius]);
     }
 
     return query;

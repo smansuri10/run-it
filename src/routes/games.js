@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const gameController = require('../controllers/gameController');
 const { authenticate } = require('../middleware/auth');
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 
 /**
  * Validation error handler — reused across routes.
@@ -14,6 +14,15 @@ const handleValidationErrors = (req, res, next) => {
     }
     next();
 };
+
+/**
+ * Validates that :id route param is a valid UUID.
+ * Prevents raw Postgres cast errors on malformed IDs.
+ */
+const validateGameId = [
+    param('id').isUUID().withMessage('Game ID must be a valid UUID'),
+    handleValidationErrors,
+];
 
 /**
  * Validation rules for POST /games
@@ -76,11 +85,11 @@ const validateCreateGame = [
 
 // Public routes — no auth required
 router.get('/', gameController.listGames);
-router.get('/:id', gameController.getGameById);
+router.get('/:id', validateGameId, gameController.getGameById);
 
 // Protected routes — auth required
 router.post('/', authenticate, validateCreateGame, gameController.createGame);
-router.post('/:id/join', authenticate, gameController.joinGame);
-router.delete('/:id/join', authenticate, gameController.leaveGame);
+router.post('/:id/join', authenticate, validateGameId, gameController.joinGame);
+router.delete('/:id/join', authenticate, validateGameId, gameController.leaveGame);
 
 module.exports = router;
