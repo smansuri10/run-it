@@ -43,14 +43,15 @@ Phase 1 — Core (must ship)
 - [x] Auth test suite (109/110 passing — 1 intentional blocklist sentinel)
 
 ### Games
-- [ ] POST /games (create)
-- [ ] GET /games (list with location filter)
-- [ ] GET /games/:id (detail)
-- [ ] POST /games/:id/join
-- [ ] DELETE /games/:id/join (leave)
+- [x] POST /games (create)
+- [x] GET /games (list with location filter)
+- [x] GET /games/:id (detail)
+- [x] POST /games/:id/join
+- [x] DELETE /games/:id/join (leave)
+- [x] Games test suite (177/178 passing — 1 intentional blocklist sentinel)
 
 ### Map
-- [ ] GET /games?lat=&lng=&radius= (map endpoint)
+- [ ] GET /games?lat=&lng=&radius= (map endpoint — covered by GET /games filters)
 
 ## Agent 1 — Backend engineer log
 
@@ -100,9 +101,38 @@ Verified working:
 - 109/110 tests passing — 1 intentional failure documents missing blocklist
 
 Handoff to Agent 2: Complete — see Session 2 entry below.
-Handoff to Agent 3: Auth decisions ready to document. Key ADRs needed:
-JWT + httpOnly cookie strategy, bcrypt rounds, rate limiting, timing fix,
-blocklist deferral reasoning.
+Handoff to Agent 3: Auth decisions ready to document.
+
+### Session 3 — Games (completed)
+Built: Full games feature — create, list, detail, join, leave with waitlist logic
+Files created:
+- src/models/gameModel.js — 12 DB functions including Haversine geo filter
+- src/services/gameService.js — createGame, getGameById, listGames, joinGame, leaveGame
+- src/controllers/gameController.js — 5 endpoints
+- src/routes/games.js — public and protected routes with UUID param validation
+- src/index.js — updated to mount games routes
+
+Key decisions:
+- GET /games and GET /games/:id are public — no auth required for discovery
+- Host automatically added as first player with role host on game creation
+- Waitlist promotion is FIFO via joined_at ordering
+- Host cannot leave — cancel endpoint deferred to later session
+- Haversine formula clamped with GREATEST/LEAST to prevent acos out-of-range error
+- Falsy-zero bug fixed — coordinate 0 no longer rejected as missing location
+- UUID validation on all :id params — clean 400 instead of raw Postgres cast error
+- COALESCE handles both known field coordinates and freeform game coordinates
+
+Verified working:
+- POST /games creates game, host added automatically as first player
+- GET /games lists open future games with display_location computed field
+- GET /games/:id returns game with players array, player_count, spots_remaining
+- POST /games/:id/join adds as player or waitlist depending on capacity
+- DELETE /games/:id/join removes player, promotes waitlist if game was full
+- No token returns 401, already in game returns 409, invalid UUID returns 400
+- 177/178 tests passing — 1 intentional failure (blocklist sentinel)
+
+Handoff to Agent 2: Complete — see Session 3 entry below.
+Handoff to Agent 3: Games decisions ready to document.
 
 ## Agent 2 — QA engineer log
 
@@ -127,20 +157,31 @@ Key findings addressed:
 - FIXED — knexfile test DB hardcoded to runit_test
 - FIXED — Rate limiter disabled in test environment
 - DEFERRED — Logout does not invalidate refresh token (no blocklist)
-  One intentional failing test documents this gap.
   Fix planned for Session 5 — auth hardening.
 
-Handoff to Agent 1:
-Auth system solid. Address blocklist before public launch.
-Ready to build Session 3 — games endpoints.
+Handoff to Agent 1: Auth system solid. Ready for Session 3 games endpoints.
 
-Handoff to Agent 3:
-ADRs to write:
-- ADR-004: JWT + httpOnly cookie auth strategy
-- ADR-005: bcrypt rounds selection
-- ADR-006: Rate limiting per endpoint type
-- ADR-007: Refresh token blocklist — deferred decision and reasoning
-- ADR-008: Constant-time login pattern
+### Session 3 — Games feature review and testing (completed)
+Status: Complete. Findings delivered, full test suite passing.
+
+Files created:
+- tests/unit/gameService.test.js — 27 unit tests, model layer mocked
+- tests/integration/games.test.js — integration tests for all 5 game routes
+
+Results: 177/178 passing — 1 intentional failure (blocklist sentinel)
+
+Key findings addressed:
+- FIXED — Falsy-zero bug on location coordinates in createGame and findAll
+- FIXED — UUID validation on :id params — clean 400 instead of raw 500
+- FIXED — Haversine acos clamp prevents out-of-range Postgres error
+- DEFERRED — Join race condition needs transaction design decision
+- DEFERRED — No cancel endpoint exists — leaveGame references it but route does not exist
+- DEFERRED — No query param validation on GET /games
+- NOTED — Join does not re-check starts_at (intentional grace period)
+
+Handoff to Agent 1:
+Address race condition and cancel endpoint before public launch.
+Ready for Session 4 — frontend.
 
 ## Agent 3 — Tech writer log
 
@@ -160,22 +201,36 @@ Suggested ADRs to write:
 - ADR-007: Refresh token blocklist — deferred decision and reasoning
 - ADR-008: Constant-time login pattern
 
+### Session 3
+Status: Games decisions ready to document.
+Suggested ADRs to write:
+- ADR-009: Waitlist promotion strategy (FIFO via joined_at)
+- ADR-010: Haversine distance filter and acos clamp
+- ADR-011: Public vs protected route decision for game discovery
+- ADR-012: Cancel game deferred — reasoning and plan
+
 ## Open questions and blockers
 
 Refresh token blocklist not yet implemented — documented as known gap.
 Low risk in development, required before public launch.
 
+Join race condition not yet resolved — two simultaneous joins on the last
+spot could overfill a game. Needs transaction design decision before launch.
+
+Cancel game endpoint not yet built — leaveGame blocks host from leaving
+but no cancel route exists. Planned for a future session.
+
 ## Handoff notes (updated each session)
 
 ### Latest from Agent 1
-Auth complete and hardened. All endpoints verified working via curl.
-Run npm run dev and test with curl before starting games.
+Games complete and hardened. 177/178 tests passing.
+Sport seeded in runit_dev: Soccer id=1.
+Ready for Session 4 — frontend.
 
 ### Latest from Agent 2
-Auth test suite complete. 109 of 110 tests passing.
-1 intentional failure documents the missing token blocklist.
-All critical and high findings fixed. Blocklist deferred to Session 5.
-Ready for Agent 1 to build Session 3 games endpoints.
+Games test suite complete. 177/178 passing.
+Key deferred items: join race condition, cancel endpoint.
+Ready for Session 4 — frontend.
 
 ### Latest from Agent 3
 Nothing yet — documentation pending.
@@ -185,11 +240,14 @@ Nothing yet — documentation pending.
 runit_dev tables: sports, users, fields, games, game_players, messages,
 knex_migrations, knex_migrations_lock
 
-Seed data: Test users created during development testing (salim@test.com,
-test2@test.com, testuser). Safe to ignore — runit_test is clean.
+Seed data:
+- Sports: Soccer id=1
+- Test users: salim@test.com, test2@test.com, player2@test.com
+- Test games: Pier Park game created during Session 3 testing
 
 Test DB (runit_test): Migrations run automatically via beforeAll.
 Wiped between every test via beforeEach. Clean state guaranteed.
+Sports seeded in beforeAll by integration test setup.
 
 ## Decisions log (quick reference)
 
@@ -210,3 +268,10 @@ Wiped between every test via beforeEach. Clean state guaranteed.
 | Middleware strips password_hash defensively | Safe even if model changes later                           | pending |
 | Blocklist deferred to Session 5             | Low risk for dev phase, required before public launch      | pending |
 | Rate limiter bypassed in test env           | 1000 req limit prevents false 429s in test suite           | pending |
+| GET /games public, POST protected           | Discovery without account, actions require auth            | pending |
+| Waitlist promotion FIFO                     | joined_at ordering — first in first promoted               | pending |
+| Haversine GREATEST/LEAST clamp              | Prevents acos domain error on identical coordinates        | pending |
+| Falsy-zero check on coordinates             | 0 is valid lat/lng — use undefined/null not truthiness     | pending |
+| UUID param validation                       | Clean 400 instead of raw Postgres cast error               | pending |
+| Join race condition deferred                | Needs transaction design decision before public launch     | pending |
+| Cancel game deferred                        | Host cannot leave but no cancel route exists yet           | pending |

@@ -69,7 +69,16 @@ See AGENT_LOG.md for the full picture. Summary:
 - Initial migration — all 6 tables created with indexes and constraints
 - Full auth system — register, login, refresh, logout, auth middleware
 - Auth hardened — timing fix, username uniqueness, middleware defensive strip
-- Full test suite passing — 109/110 (1 intentional blocklist sentinel)
+- Full games feature — create, list, detail, join, leave with waitlist logic
+- Games hardened — falsy-zero fix, UUID validation, Haversine acos clamp
+- Sports table seeded: Soccer id=1 in runit_dev
+- Test suite: 177/178 passing — 1 intentional blocklist sentinel
+
+## Known deferred items
+
+- Refresh token blocklist — logout is cosmetic until implemented (Session 5)
+- Cancel game endpoint — leaveGame references it but route does not exist yet
+- Join race condition — count check and insert not wrapped in a transaction
 
 ## Session workflow
 
