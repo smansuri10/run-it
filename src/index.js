@@ -24,6 +24,7 @@ app.use(
 // ─── Health check ──────────────────────────────────────────────────────────────
 const db = require('./config/db');
 const authRoutes = require('./routes/auth');
+const gamesRoutes = require('./routes/games');
 
 app.get('/health', async (req, res) => {
     try {
@@ -40,6 +41,7 @@ app.get('/health', async (req, res) => {
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/auth', authRoutes);
+app.use('/games', gamesRoutes);
 
 // ─── Base route ────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
