@@ -21,6 +21,9 @@ app.use(
     })
 );
 
+// ─── Static files ─────────────────────────────────────────────────────────────
+app.use(express.static('public'));
+
 // ─── Health check ──────────────────────────────────────────────────────────────
 const db = require('./config/db');
 const authRoutes = require('./routes/auth');

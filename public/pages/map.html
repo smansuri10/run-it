@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Run It — Discover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .discover-layout {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .games-panel {
+            width: 400px;
+            min-width: 400px;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid var(--border);
+        }
+
+        .games-panel-header {
+            padding: 16px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .panel-logo {
+            font-size: 18px;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--white);
+            background: var(--blue);
+            padding: 4px 16px;
+            border-radius: 999px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0 12px;
+            height: 44px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            font-family: inherit;
+            background: transparent;
+        }
+
+        .sport-filters {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .sport-filter {
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--text);
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .sport-filter.active {
+            background: var(--blue);
+            color: var(--white);
+            border-color: var(--blue);
+        }
+
+        .games-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .game-card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .game-card.highlighted {
+            outline: 2px solid var(--blue);
+        }
+
+        .game-card-body {
+            padding: 14px;
+        }
+
+        .game-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .game-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .game-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .game-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .game-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .spots-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .spots-available {
+            color: var(--green);
+        }
+
+        .spots-full {
+            color: var(--red);
+        }
+
+        .map-panel {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-location-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 1000;
+            background: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .discover-layout {
+                flex-direction: column;
+            }
+
+            .games-panel {
+                width: 100%;
+                min-width: unset;
+                height: 50vh;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .map-panel {
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="discover-layout" x-data="mapView()">
+
+        <div class="games-panel">
+            <div class="games-panel-header">
+
+                <div class="panel-top">
+                    <div class="panel-logo">Run it</div>
+                    <button class="btn btn-outline" style="height:32px;padding:0 12px;font-size:12px;"
+                        @click="logout()">
+                        Sign out
+                    </button>
+                </div>
+
+                <div class="search-bar">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Search games, locations..." x-model="search" />
+                </div>
+                <div class="sport-filters">
+                    <button class="sport-filter active">⚽ Soccer</button>
+                    <button class="sport-filter">🏀 Basketball</button>
+                    <button class="sport-filter">🏐 Volleyball</button>
+                    <button class="sport-filter">🎾 Tennis</button>
+                </div>
+            </div>
+
+            <div class="games-list">
+                <div x-show="loading" class="empty-state">
+                    <p>Loading games...</p>
+                </div>
+
+                <div x-show="!loading && filteredGames.length === 0" class="empty-state">
+                    <p style="font-size: 32px">⚽</p>
+                    <p>No games found nearby.</p>
+                    <p style="margin-top: 4px">Be the first to create one!</p>
+                </div>
+
+                <template x-for="game in filteredGames" :key="game.id">
+                    <div class="game-card" :class="{ highlighted: highlightedGame === game.id }"
+                        @click="openGame(game.id)" @mouseenter="highlightPin(game.id)" @mouseleave="highlightPin(null)">
+                        <div class="game-card-body">
+                            <div class="game-card-top">
+                                <span class="pill pill-blue">⚽ Soccer</span>
+                                <span class="pill" :class="game.status === 'full' ? 'pill-red' : 'pill-green'"
+                                    x-text="game.status === 'full' ? 'Full' : 'Open'"></span>
+                            </div>
+
+                            <div class="game-title" x-text="game.description || 'Pickup Game'"></div>
+
+                            <div class="game-meta">
+                                <div class="game-meta-row">
+                                    <span>📍</span>
+                                    <span x-text="game.display_location || game.location_name"></span>
+                                </div>
+                                <div class="game-meta-row">
+                                    <span>🕐</span>
+                                    <span x-text="formatDate(game.starts_at)"></span>
+                                </div>
+                            </div>
+
+                            <div class="game-card-footer">
+                                <span class="spots-text"
+                                    :class="game.status === 'full' ? 'spots-full' : 'spots-available'"
+                                    x-text="game.status === 'full' ? 'Game full' : (game.max_players - (game.player_count || 1)) + ' spots left'"></span>
+                                <button class="btn btn-primary" style="height:36px;padding:0 16px;font-size:13px;"
+                                    @click.stop="openGame(game.id)">
+                                    View
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div class="map-panel">
+            <div id="map"></div>
+            <button class="map-location-btn" @click="useMyLocation()">
+                📍 Use my location
+            </button>
+        </div>
+
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/map.js"></script>
+</body>
+
+</html>

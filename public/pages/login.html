@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Run It — Sign In</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <style>
+        .auth-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Left panel — blue brand side */
+        .auth-left {
+            flex: 1;
+            background: #1A1AE6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+            gap: 32px;
+        }
+
+        .auth-logo {
+            font-size: 32px;
+            font-weight: 700;
+            font-style: italic;
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 28px;
+            border-radius: 999px;
+        }
+
+        .auth-tagline {
+            font-size: 20px;
+            color: white;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .auth-features {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .auth-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+        }
+
+        .auth-feature-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        /* Right panel — form side */
+        .auth-right {
+            width: 480px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+        }
+
+        .auth-form-container {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .auth-form-container h1 {
+            margin-bottom: 4px;
+        }
+
+        .auth-subtitle {
+            color: #6B6B6B;
+            margin-bottom: 32px;
+        }
+
+        .auth-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: #6B6B6B;
+            font-size: 13px;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #E0E0E0;
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #6B6B6B;
+            font-size: 14px;
+        }
+
+        .auth-toggle a {
+            color: #00BFFF;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mobile — stack vertically */
+        @media (max-width: 768px) {
+            .auth-layout {
+                flex-direction: column;
+            }
+
+            .auth-left {
+                padding: 32px 24px;
+                gap: 20px;
+            }
+
+            .auth-right {
+                width: 100%;
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-layout">
+
+        <!-- Left — brand panel -->
+        <div class="auth-left">
+            <div class="auth-logo">Run it</div>
+            <p class="auth-tagline">Find Games. Join Up. Play Now.</p>
+            <div class="auth-features">
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">📍</div>
+                    <span>Find pickup games near you instantly</span>
+                </div>
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">⚽</div>
+                    <span>Join or host games in any sport</span>
+                </div>
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">💬</div>
+                    <span>Chat with players before you show up</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right — form panel -->
+        <div class="auth-right">
+            <div class="auth-form-container" x-data="authForm()">
+
+                <!-- Login form -->
+                <div x-show="mode === 'login'">
+                    <h1>Welcome back</h1>
+                    <p class="auth-subtitle">Sign in to Run It</p>
+
+                    <div class="auth-fields">
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" placeholder="you@example.com" x-model="email" />
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" placeholder="••••••••" x-model="password" />
+                        </div>
+                    </div>
+
+                    <p class="error-msg" x-show="error" x-text="error"></p>
+
+                    <button class="btn btn-primary btn-full" :class="{ loading: submitting }" :disabled="submitting"
+                        @click="login()">
+                        <span x-text="submitting ? 'Signing in...' : 'Sign In'"></span>
+                    </button>
+
+                    <div class="auth-toggle">
+                        Don't have an account?
+                        <a href="#" @click.prevent="mode = 'register'">Sign up</a>
+                    </div>
+                </div>
+
+                <!-- Register form -->
+                <div x-show="mode === 'register'">
+                    <h1>Create account</h1>
+                    <p class="auth-subtitle">Join Run It and find your game</p>
+
+                    <div class="auth-fields">
+                        <div class="input-group">
+                            <label>Full name</label>
+                            <input type="text" placeholder="Salim Mansuri" x-model="fullName" />
+                        </div>
+                        <div class="input-group">
+                            <label>Username</label>
+                            <input type="text" placeholder="salim_10" x-model="username" />
+                        </div>
+                        <div class="input-group">
+                            <label>Email</label>
+                            <input type="email" placeholder="you@example.com" x-model="email" />
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" placeholder="Min 8 chars, 1 uppercase, 1 number"
+                                x-model="password" />
+                        </div>
+                    </div>
+
+                    <p class="error-msg" x-show="error" x-text="error"></p>
+
+                    <button class="btn btn-primary btn-full" :class="{ loading: submitting }" :disabled="submitting"
+                        @click="register()">
+                        <span x-text="submitting ? 'Creating account...' : 'Create Account'"></span>
+                    </button>
+
+                    <div class="auth-toggle">
+                        Already have an account?
+                        <a href="#" @click.prevent="mode = 'login'">Sign in</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Redirect if already logged in
+        redirectIfLoggedIn();
+
+        function authForm() {
+            return {
+                mode: 'login',
+                email: '',
+                password: '',
+                username: '',
+                fullName: '',
+                error: '',
+                submitting: false,
+
+                async login() {
+                    this.error = '';
+                    this.submitting = true;
+                    try {
+                        await handleLogin(this.email, this.password);
+                    } catch (err) {
+                        this.error = err.message || 'Invalid email or password';
+                    } finally {
+                        this.submitting = false;
+                    }
+                },
+
+                async register() {
+                    this.error = '';
+                    this.submitting = true;
+                    try {
+                        await handleRegister(
+                            this.email,
+                            this.password,
+                            this.username,
+                            this.fullName
+                        );
+                    } catch (err) {
+                        this.error = err.message || 'Could not create account';
+                    } finally {
+                        this.submitting = false;
+                    }
+                },
+            };
+        }
+    </script>
+</body>
+
+</html>
