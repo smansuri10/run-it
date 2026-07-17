@@ -241,7 +241,6 @@
 
         <div class="games-panel">
             <div class="games-panel-header">
-
                 <div class="panel-top">
                     <div class="panel-logo">Run it</div>
                     <button class="btn btn-outline" style="height:32px;padding:0 12px;font-size:12px;"
@@ -251,9 +250,13 @@
                 </div>
 
                 <div class="search-bar">
-                    <span>🔍</span>
-                    <input type="text" placeholder="Search games, locations..." x-model="search" />
+                    <span aria-hidden="true">🔍</span>
+                    <input type="text" placeholder="Search games, locations..." x-model="search"
+                        aria-label="Search games" />
                 </div>
+
+                <!-- TODO: Wire up sport filter @click handlers in Session 5
+                     Currently display only — only Soccer is active -->
                 <div class="sport-filters">
                     <button class="sport-filter active">⚽ Soccer</button>
                     <button class="sport-filter">🏀 Basketball</button>
@@ -268,14 +271,16 @@
                 </div>
 
                 <div x-show="!loading && filteredGames.length === 0" class="empty-state">
-                    <p style="font-size: 32px">⚽</p>
+                    <p style="font-size: 32px" aria-hidden="true">⚽</p>
                     <p>No games found nearby.</p>
                     <p style="margin-top: 4px">Be the first to create one!</p>
                 </div>
 
                 <template x-for="game in filteredGames" :key="game.id">
-                    <div class="game-card" :class="{ highlighted: highlightedGame === game.id }"
-                        @click="openGame(game.id)" @mouseenter="highlightPin(game.id)" @mouseleave="highlightPin(null)">
+                    <div class="game-card" role="button" tabindex="0"
+                        :class="{ highlighted: highlightedGame === game.id }" @click="openGame(game.id)"
+                        @keyup.enter="openGame(game.id)" @mouseenter="highlightPin(game.id)"
+                        @mouseleave="highlightPin(null)">
                         <div class="game-card-body">
                             <div class="game-card-top">
                                 <span class="pill pill-blue">⚽ Soccer</span>
@@ -287,11 +292,11 @@
 
                             <div class="game-meta">
                                 <div class="game-meta-row">
-                                    <span>📍</span>
+                                    <span aria-hidden="true">📍</span>
                                     <span x-text="game.display_location || game.location_name"></span>
                                 </div>
                                 <div class="game-meta-row">
-                                    <span>🕐</span>
+                                    <span aria-hidden="true">🕐</span>
                                     <span x-text="formatDate(game.starts_at)"></span>
                                 </div>
                             </div>
@@ -314,7 +319,7 @@
         <div class="map-panel">
             <div id="map"></div>
             <button class="map-location-btn" @click="useMyLocation()">
-                📍 Use my location
+                <span aria-hidden="true">📍</span> Use my location
             </button>
         </div>
 

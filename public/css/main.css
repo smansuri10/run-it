@@ -159,7 +159,10 @@ h3 {
     color: #991b1b;
 }
 
-/* ─── Sidebar layout (desktop) ─────────────────────────────────────── */
+/* ─── Sidebar layout (desktop) ──────────────────────────────────────────────
+TODO: Wire up sidebar and bottom-nav markup in map.html and game.html.
+Currently each page rolls its own layout. Planned for Session 5.
+────────────────────────────────────────────────────────────────────────────── */
 .app-layout {
     display: flex;
     height: 100vh;
@@ -178,7 +181,6 @@ h3 {
 }
 
 .sidebar-logo {
-    padding: 0 24px 24px;
     font-size: 20px;
     font-weight: 700;
     font-style: italic;

@@ -79,7 +79,6 @@
             margin-top: 12px;
         }
 
-        /* Sticky action card */
         .game-action-card {
             background: var(--white);
             border: 1px solid var(--border);
@@ -127,7 +126,6 @@
             background: var(--red);
         }
 
-        /* Players section */
         .players-section {
             background: var(--white);
             border-radius: 12px;
@@ -213,40 +211,36 @@
 
         <a href="/pages/map.html" class="back-link">← Back to games</a>
 
-        <!-- Loading -->
         <div x-show="loading" class="loading-state">
             <p>Loading game...</p>
         </div>
 
-        <!-- Game detail -->
         <div x-show="!loading && game">
 
             <div class="game-hero">
                 <div class="game-hero-body">
 
-                    <!-- Left: game info -->
                     <div class="game-info-section">
                         <span class="pill pill-blue">⚽ Soccer</span>
                         <h1 x-text="game.description || 'Pickup Game'"></h1>
 
                         <div class="game-host">
                             <div class="avatar" style="width:28px;height:28px;font-size:11px;"
-                                x-text="getPlayerInitials(host)">
-                            </div>
+                                x-text="getPlayerInitials(host)" aria-hidden="true"></div>
                             <span>Hosted by <strong x-text="host ? host.username : '...'"></strong></span>
                         </div>
 
                         <div class="game-details-list">
                             <div class="game-detail-row">
-                                <span>📍</span>
+                                <span aria-hidden="true">📍</span>
                                 <span x-text="game.display_location || game.location_name"></span>
                             </div>
                             <div class="game-detail-row">
-                                <span>🕐</span>
+                                <span aria-hidden="true">🕐</span>
                                 <span x-text="formatDate(game.starts_at)"></span>
                             </div>
                             <div class="game-detail-row" x-show="game.skill_level && game.skill_level !== 'any'">
-                                <span>⭐</span>
+                                <span aria-hidden="true">⭐</span>
                                 <span x-text="capitalize(game.skill_level)"></span>
                             </div>
                         </div>
@@ -254,12 +248,12 @@
                         <p class="game-description" x-show="game.description" x-text="game.description"></p>
                     </div>
 
-                    <!-- Right: action card -->
                     <div class="game-action-card">
                         <div class="spots-display">
                             <div class="spots-number" x-text="game.player_count + '/' + game.max_players"></div>
                             <div class="spots-label">players joined</div>
-                            <div class="spots-bar">
+                            <div class="spots-bar" role="progressbar" :aria-valuenow="game.player_count"
+                                :aria-valuemax="game.max_players" aria-valuemin="0">
                                 <div class="spots-bar-fill" :class="{ full: game.status === 'full' }"
                                     :style="'width:' + (game.player_count / game.max_players * 100) + '%'"></div>
                             </div>
@@ -269,16 +263,13 @@
                             :class="game.status === 'full' ? 'pill-red' : 'pill-green'"
                             x-text="game.status === 'full' ? 'Game Full' : 'Open'"></span>
 
-                        <!-- Join button -->
                         <button x-show="!isInGame && !isHost" class="btn btn-primary btn-full" :disabled="submitting"
                             @click="joinGame()"
                             x-text="submitting ? 'Joining...' : (game.status === 'full' ? 'Join Waitlist' : 'Join Game')"></button>
 
-                        <!-- Leave button -->
                         <button x-show="isInGame && !isHost" class="btn btn-danger btn-full" :disabled="submitting"
                             @click="leaveGame()" x-text="submitting ? 'Leaving...' : 'Leave Game'"></button>
 
-                        <!-- Host label -->
                         <div x-show="isHost" class="pill pill-blue btn-full" style="justify-content:center;">
                             You are the host
                         </div>
@@ -290,14 +281,14 @@
                 </div>
             </div>
 
-            <!-- Players -->
             <div class="players-section">
                 <h2>Who's Playing</h2>
                 <div class="players-grid">
                     <template x-for="player in game.players" :key="player.id">
                         <div class="player-item">
                             <div class="player-avatar" :class="{ host: player.role === 'host' }"
-                                x-text="getPlayerInitials(player)"></div>
+                                x-text="getPlayerInitials(player)"
+                                :aria-label="player.username + (player.role === 'host' ? ' (host)' : '')"></div>
                             <div class="player-name" x-text="player.username"></div>
                             <div class="player-role-badge" x-show="player.role === 'host'">Host</div>
                             <div class="player-role-badge" x-show="player.role === 'waitlist'">Waitlist</div>
@@ -308,7 +299,6 @@
 
         </div>
 
-        <!-- Not found -->
         <div x-show="!loading && !game" class="loading-state">
             <p>Game not found.</p>
             <a href="/pages/map.html" class="btn btn-primary" style="margin-top:16px;">Back to map</a>

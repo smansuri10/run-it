@@ -14,7 +14,6 @@
             min-height: 100vh;
         }
 
-        /* Left panel — blue brand side */
         .auth-left {
             flex: 1;
             background: #1A1AE6;
@@ -71,7 +70,6 @@
             font-size: 16px;
         }
 
-        /* Right panel — form side */
         .auth-right {
             width: 480px;
             background: white;
@@ -128,7 +126,7 @@
         }
 
         .auth-toggle a {
-            color: #00BFFF;
+            color: #1A1AE6;
             text-decoration: none;
             font-weight: 500;
         }
@@ -137,7 +135,12 @@
             text-decoration: underline;
         }
 
-        /* Mobile — stack vertically */
+        .input-hint {
+            font-size: 12px;
+            color: #6B6B6B;
+            margin-top: 2px;
+        }
+
         @media (max-width: 768px) {
             .auth-layout {
                 flex-direction: column;
@@ -165,15 +168,15 @@
             <p class="auth-tagline">Find Games. Join Up. Play Now.</p>
             <div class="auth-features">
                 <div class="auth-feature">
-                    <div class="auth-feature-icon">📍</div>
+                    <div class="auth-feature-icon" aria-hidden="true">📍</div>
                     <span>Find pickup games near you instantly</span>
                 </div>
                 <div class="auth-feature">
-                    <div class="auth-feature-icon">⚽</div>
+                    <div class="auth-feature-icon" aria-hidden="true">⚽</div>
                     <span>Join or host games in any sport</span>
                 </div>
                 <div class="auth-feature">
-                    <div class="auth-feature-icon">💬</div>
+                    <div class="auth-feature-icon" aria-hidden="true">💬</div>
                     <span>Chat with players before you show up</span>
                 </div>
             </div>
@@ -190,12 +193,13 @@
 
                     <div class="auth-fields">
                         <div class="input-group">
-                            <label>Email</label>
-                            <input type="email" placeholder="you@example.com" x-model="email" />
+                            <label for="login-email">Email</label>
+                            <input id="login-email" type="email" placeholder="you@example.com" x-model="email" />
                         </div>
                         <div class="input-group">
-                            <label>Password</label>
-                            <input type="password" placeholder="••••••••" x-model="password" />
+                            <label for="login-password">Password</label>
+                            <input id="login-password" type="password" placeholder="••••••••" x-model="password"
+                                @keyup.enter="login()" />
                         </div>
                     </div>
 
@@ -219,21 +223,24 @@
 
                     <div class="auth-fields">
                         <div class="input-group">
-                            <label>Full name</label>
-                            <input type="text" placeholder="Salim Mansuri" x-model="fullName" />
+                            <label for="reg-fullname">Full name</label>
+                            <input id="reg-fullname" type="text" placeholder="Salim Mansuri" x-model="fullName" />
                         </div>
                         <div class="input-group">
-                            <label>Username</label>
-                            <input type="text" placeholder="salim_10" x-model="username" />
+                            <label for="reg-username">Username</label>
+                            <input id="reg-username" type="text" placeholder="salim_10" x-model="username" />
                         </div>
                         <div class="input-group">
-                            <label>Email</label>
-                            <input type="email" placeholder="you@example.com" x-model="email" />
+                            <label for="reg-email">Email</label>
+                            <input id="reg-email" type="email" placeholder="you@example.com" x-model="email" />
                         </div>
                         <div class="input-group">
-                            <label>Password</label>
-                            <input type="password" placeholder="Min 8 chars, 1 uppercase, 1 number"
-                                x-model="password" />
+                            <label for="reg-password">Password</label>
+                            <input id="reg-password" type="password" placeholder="••••••••" x-model="password"
+                                @keyup.enter="register()" />
+                            <span class="input-hint">
+                                Min 8 characters, 1 uppercase, 1 number
+                            </span>
                         </div>
                     </div>
 
@@ -254,12 +261,10 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="//unpkg.com/alpinejs" defer></script>
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
     <script>
-        // Redirect if already logged in
         redirectIfLoggedIn();
 
         function authForm() {
